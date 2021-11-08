@@ -23,8 +23,10 @@ const App = () => {
   let possiblePoses = ["a", "b"];
   let cool = false;
   let running = false;
-  let timer = 30;
+  const totalGameTime = 30;
+  let timer = totalGameTime;
   let movementCount = 0;
+  let debugMode = false;
 
   const keyPressed = (event) => {
     if (event.key === "s") {
@@ -50,11 +52,12 @@ const App = () => {
     video.position(0, 0);
     video.hide();
     const playButton = p5.createButton("Play/ Reset");
+    const debugButton = p5.createButton("Debug Mode");
+    const trainButton = p5.createButton("Train");
     playButton.mousePressed(() => {
       if (!running) {
         poseNet = ml5.poseNet(video, modelLoaded);
         poseNet.on("pose", gotPoses);
-
         let options = {
           inputs: 34,
           outputs: 5,
@@ -62,21 +65,31 @@ const App = () => {
           debug: true,
         };
         neurons = ml5.neuralNetwork(options);
-        //  neurons.loadData("last.json", dataReady);
         const modelSpecs = {
           model: "model4/model.json",
           metadata: "model4/model_meta.json",
           weights: "model4/model.weights.bin",
         };
         neurons.load(modelSpecs, neuronsLoaded);
-        p5.loop();
-
         running = true;
+        p5.loop();
       } else {
         running = false;
+        timer = totalGameTime;
         p5.background(51);
         if (poseNet) poseNet.removeListener("pose", gotPoses);
       }
+    });
+    debugButton.mousePressed(() => (debugMode = !debugMode));
+    trainButton.mousePressed(() => {
+      let options = {
+        inputs: 34,
+        outputs: 5,
+        task: "classification",
+        debug: true,
+      };
+      neurons = ml5.neuralNetwork(options);
+      neurons.loadData("last.json", dataReady);
     });
   };
 
@@ -97,17 +110,13 @@ const App = () => {
       }
       neurons.classify(inputs, gotResult);
     } else if (!running || timer === 0) {
-      console.log("stop");
+      return;
     } else {
       setTimeout(classifyPose, 100);
     }
   };
 
-  const gotResult = (error, results) => {
-    /*    if (pose.length === 0) {
-    } else {
-      sequence.push(results[0].label);
-    } */
+  const gotResult = (results) => {
     if (results !== undefined && results.lenght !== 0) {
       sequence.push(results[0].label);
     }
@@ -129,14 +138,13 @@ const App = () => {
   };
 
   const finished = () => {
-    console.log("model trained");
+    console.log("model finished training");
     neurons.save();
   };
+
   const gotPoses = (poses) => {
-    console.log("deteçoes:", poses);
     if (poses.length === 0) {
       pose = {};
-      console.log("imaout");
     }
     if (poses.length > 0) {
       pose = poses[0].pose;
@@ -159,6 +167,23 @@ const App = () => {
     console.log("poseNet ready");
   };
 
+  const debugPose = (p5, keypoints) => {
+    for (let i = 0; i < keypoints.length; i++) {
+      let x = keypoints[i].position.x;
+      let y = keypoints[i].position.y;
+      p5.fill(0, 255, 0);
+      p5.ellipse(x, y, 16, 16);
+    }
+
+    for (let i = 0; i < skeleton.length; i++) {
+      let a = skeleton[i][0];
+      let b = skeleton[i][1];
+      p5.strokeWeight(2);
+      p5.stroke(255);
+      p5.line(a.position.x, a.position.y, b.position.x, b.position.y);
+    }
+  };
+
   const draw = (p5) => {
     if (running) {
       p5.push();
@@ -167,25 +192,13 @@ const App = () => {
       p5.image(video, 0, 0, 320, 240);
 
       if (pose !== undefined && pose.keypoints) {
-        /*     console.log("Debug:", pose); */
-        /*    for (let i = 0; i < pose.keypoints.length; i++) {
-        let x = pose.keypoints[i].position.x;
-        let y = pose.keypoints[i].position.y;
-        p5.fill(0, 255, 0);
-        p5.ellipse(x, y, 16, 16);
-      }
-
-      for (let i = 0; i < skeleton.length; i++) {
-        let a = skeleton[i][0];
-        let b = skeleton[i][1];
-        p5.strokeWeight(2);
-        p5.stroke(255);
-        p5.line(a.position.x, a.position.y, b.position.x, b.position.y);
-      } */
+        if (debugMode) {
+          debugPose(p5, pose.keypoints);
+        }
         p5.pop();
         if (cool) {
           p5.fill(0, 255, 0);
-          //to do
+          //to do delay this a bit more
           cool = false;
         } else {
           p5.fill(255, 0, 255);
@@ -202,7 +215,11 @@ const App = () => {
         }
       }
       if (!running || timer === 0) {
-        if (poseNet) poseNet.removeListener("pose", gotPoses);
+        running = false;
+        timer = totalGameTime;
+        if (poseNet) {
+          poseNet.removeListener("pose", gotPoses);
+        }
         p5.background(51);
         p5.text(movementCount, video.width / 2 + 100, video.height / 2 - 60);
         p5.noLoop();
