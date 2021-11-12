@@ -1,4 +1,3 @@
-import "./App.css";
 import ml5 from "ml5";
 import Sketch from "react-p5";
 import mostCommon from "array-most-common";
@@ -29,7 +28,7 @@ const App = () => {
   let state = WAITING;
   let targetLabel;
   let sequence = [];
-  let randomPose = "e";
+  let randomPose = "d";
   let cool = false;
   let running = false;
   let timer = TOTAL_GAME_TIME;
@@ -61,6 +60,7 @@ const App = () => {
     video.hide();
     createButtonGroup(p5);
     p5.noLoop();
+    console.log("sim");
   };
 
   const createButtonGroup = (p5) => {
@@ -90,9 +90,9 @@ const App = () => {
       };
       neuralNetwork = ml5.neuralNetwork(options);
       const modelSpecs = {
-        model: "model4/model.json",
-        metadata: "model4/model_meta.json",
-        weights: "model4/model.weights.bin",
+        model: "model/model.json",
+        metadata: "model/model_meta.json",
+        weights: "model/model.weights.bin",
       };
       neuralNetwork?.load(modelSpecs, classifyData);
       running = true;
@@ -114,7 +114,7 @@ const App = () => {
       debug: true,
     };
     neuralNetwork = ml5.neuralNetwork(options);
-    neuralNetwork.loadData("last.json", train);
+    neuralNetwork.loadData("data.json", train);
   };
 
   const classifyData = () => {
@@ -203,10 +203,10 @@ const App = () => {
         p5.noStroke();
         p5.textSize(100);
         p5.textAlign("CENTER", "CENTER");
-        p5.text(randomPose, VIDEO_WIDTH / 2 + 100, VIDEO_HEIGHT / 2 - 60);
+        p5.text(randomPose, VIDEO_WIDTH / 2 + 220, VIDEO_HEIGHT / 2 - 110);
         p5.textSize(40);
-        p5.text(timer, VIDEO_WIDTH / 2 + 105, VIDEO_HEIGHT / 2 - 20);
-        p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 30, 40, 40);
+        p5.text(timer, VIDEO_WIDTH / 2 + 225, VIDEO_HEIGHT / 2 - 70);
+        p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 20, 80, 80);
         p5.frameCount % 60 === 0 && timer > 0 && timer--;
       }
       if (timer === 0) {
@@ -214,7 +214,11 @@ const App = () => {
         timer = TOTAL_GAME_TIME;
         poseNet?.removeListener("pose", getData);
         p5.background(51);
-        p5.text(movementCount, VIDEO_WIDTH / 2 + 100, VIDEO_HEIGHT / 2 - 60);
+        p5.text(
+          `Score:${movementCount}`,
+          VIDEO_WIDTH / 2 - 150,
+          VIDEO_HEIGHT / 2
+        );
         p5.noLoop();
         movementCount = 0;
       }
@@ -240,16 +244,7 @@ const App = () => {
 
   return (
     <div>
-      <p
-        style={{
-          fontWeight: "bold",
-          fontSize: "40px",
-          fontFamily: "fantasy",
-          color: "#E6EFF3",
-        }}
-      >
-        Boxing AI Trainer
-      </p>
+      <p className="title">Boxing AI Trainer</p>
       <Sketch setup={setup} draw={draw} keyPressed={keyPressed} />
     </div>
   );
