@@ -209,7 +209,7 @@ const App = () => {
         p5.textSize(40);
         p5.text(timer, VIDEO_WIDTH / 2 + 225, VIDEO_HEIGHT / 2 - 70);
         p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 20, 80, 80);
-        //p5.frameCount % 60 === 0 && timer > 0 && timer--;
+        p5.frameCount % FPS === 0 && timer > 0 && timer--;
       }
       if (timer === 0) {
         running = false;
