@@ -9,6 +9,7 @@ const {
   VIDEO_WIDTH,
   POSSIBLE_POSES,
   STATE: { WAITING, COLLECTING },
+  FPS,
 } = constants;
 
 const VIDEO_SETTINGS = {
@@ -16,6 +17,7 @@ const VIDEO_SETTINGS = {
     audio: false,
     height: VIDEO_HEIGHT,
     width: VIDEO_WIDTH,
+    maxFrameRate: FPS,
   },
 };
 
@@ -53,6 +55,7 @@ const App = () => {
   };
 
   const setup = (p5) => {
+    p5.frameRate(FPS);
     p5.createCanvas(VIDEO_WIDTH, VIDEO_HEIGHT);
     p5.background(51);
     video = p5.createCapture(VIDEO_SETTINGS);
@@ -60,7 +63,6 @@ const App = () => {
     video.hide();
     createButtonGroup(p5);
     p5.noLoop();
-    console.log("sim");
   };
 
   const createButtonGroup = (p5) => {
@@ -83,16 +85,16 @@ const App = () => {
       poseNet = ml5.poseNet(video);
       poseNet.on("pose", getData);
       let options = {
-        inputs: 34,
+        inputs: 22,
         outputs: 5,
         task: "classification",
         debug: true,
       };
       neuralNetwork = ml5.neuralNetwork(options);
       const modelSpecs = {
-        model: "model/model.json",
-        metadata: "model/model_meta.json",
-        weights: "model/model.weights.bin",
+        model: "mini/model.json",
+        metadata: "mini/model_meta.json",
+        weights: "mini/model.weights.bin",
       };
       neuralNetwork?.load(modelSpecs, classifyData);
       running = true;
@@ -108,13 +110,13 @@ const App = () => {
 
   const onTrainButtonClick = () => {
     let options = {
-      inputs: 34,
-      outputs: 5,
+      inputs: 22,
+      outputs: 4,
       task: "classification",
       debug: true,
     };
     neuralNetwork = ml5.neuralNetwork(options);
-    neuralNetwork.loadData("data.json", train);
+    neuralNetwork.loadData("mini.json", train);
   };
 
   const classifyData = () => {
@@ -156,7 +158,7 @@ const App = () => {
 
   const train = () => {
     neuralNetwork.normalizeData();
-    neuralNetwork.train({ epochs: 100 }, saveModel);
+    neuralNetwork.train({ epochs: 30 }, saveModel);
   };
 
   const saveModel = () => {
@@ -172,7 +174,7 @@ const App = () => {
       skeleton = poses[0].skeleton;
       if (state === COLLECTING) {
         let inputs = [];
-        for (let i = 0; i < pose.keypoints.length; i++) {
+        for (let i = 0; i < 11; i++) {
           let x = pose.keypoints[i].position.x;
           let y = pose.keypoints[i].position.y;
           inputs.push(x);
@@ -207,7 +209,7 @@ const App = () => {
         p5.textSize(40);
         p5.text(timer, VIDEO_WIDTH / 2 + 225, VIDEO_HEIGHT / 2 - 70);
         p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 20, 80, 80);
-        p5.frameCount % 60 === 0 && timer > 0 && timer--;
+        //p5.frameCount % 60 === 0 && timer > 0 && timer--;
       }
       if (timer === 0) {
         running = false;
@@ -215,7 +217,7 @@ const App = () => {
         poseNet?.removeListener("pose", getData);
         p5.background(51);
         p5.text(
-          `Score:${movementCount}`,
+          `Score: ${movementCount}`,
           VIDEO_WIDTH / 2 - 150,
           VIDEO_HEIGHT / 2
         );
