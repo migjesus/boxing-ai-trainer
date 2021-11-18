@@ -5,6 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   background-color: black;
+  text-align: center;
 }
 
 canvas {

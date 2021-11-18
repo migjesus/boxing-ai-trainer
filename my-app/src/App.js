@@ -54,9 +54,9 @@ const App = () => {
     }
   };
 
-  const setup = (p5) => {
+  const setup = (p5, canvasParentRef) => {
     p5.frameRate(FPS);
-    p5.createCanvas(VIDEO_WIDTH, VIDEO_HEIGHT);
+    p5.createCanvas(VIDEO_WIDTH, VIDEO_HEIGHT, "WEBGL").parent(canvasParentRef);
     p5.background(51);
     video = p5.createCapture(VIDEO_SETTINGS);
     video.position(0, 0);
@@ -86,7 +86,7 @@ const App = () => {
       poseNet.on("pose", getData);
       let options = {
         inputs: 22,
-        outputs: 5,
+        outputs: 4,
         task: "classification",
         debug: true,
       };
@@ -122,7 +122,7 @@ const App = () => {
   const classifyData = () => {
     if (pose && pose.keypoints && running && timer !== 0) {
       let inputs = [];
-      for (let i = 0; i < pose.keypoints.length; i++) {
+      for (let i = 0; i < 11; i++) {
         let x = pose.keypoints[i].position.x;
         let y = pose.keypoints[i].position.y;
         inputs.push(x);
@@ -137,6 +137,10 @@ const App = () => {
   };
 
   const getLabel = (error, results) => {
+    if (error) {
+      console.log("error");
+      return;
+    }
     if (results !== undefined && results.lenght !== 0) {
       sequence.push(results[0].label);
     }
@@ -168,8 +172,7 @@ const App = () => {
   const getData = (poses) => {
     if (poses.length === 0) {
       pose = {};
-    }
-    if (poses.length > 0) {
+    } else {
       pose = poses[0].pose;
       skeleton = poses[0].skeleton;
       if (state === COLLECTING) {
@@ -207,7 +210,16 @@ const App = () => {
         p5.textAlign("CENTER", "CENTER");
         p5.text(randomPose, VIDEO_WIDTH / 2 + 220, VIDEO_HEIGHT / 2 - 110);
         p5.textSize(40);
+        p5.fill(255, 0, 0);
         p5.text(timer, VIDEO_WIDTH / 2 + 225, VIDEO_HEIGHT / 2 - 70);
+        p5.textSize(20);
+        p5.fill(0, 255, 0);
+        p5.text(
+          `FPS: ${p5.frameRate()}`,
+          VIDEO_WIDTH / 2 + 215,
+          VIDEO_HEIGHT / 2 - 40
+        );
+        p5.fill(255, 0, 255);
         p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 20, 80, 80);
         p5.frameCount % FPS === 0 && timer > 0 && timer--;
       }
@@ -216,6 +228,7 @@ const App = () => {
         timer = TOTAL_GAME_TIME;
         poseNet?.removeListener("pose", getData);
         p5.background(51);
+        p5.textSize(40);
         p5.text(
           `Score: ${movementCount}`,
           VIDEO_WIDTH / 2 - 150,
