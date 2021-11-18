@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/boxing-ai-trainer/static/css/main.e28e90fb.chunk.css",
+    "main.js": "/boxing-ai-trainer/static/js/main.40d83200.chunk.js",
+    "main.js.map": "/boxing-ai-trainer/static/js/main.40d83200.chunk.js.map",
+    "runtime-main.js": "/boxing-ai-trainer/static/js/runtime-main.04d7ecb0.js",
+    "runtime-main.js.map": "/boxing-ai-trainer/static/js/runtime-main.04d7ecb0.js.map",
+    "static/js/2.8bbef520.chunk.js": "/boxing-ai-trainer/static/js/2.8bbef520.chunk.js",
+    "static/js/2.8bbef520.chunk.js.map": "/boxing-ai-trainer/static/js/2.8bbef520.chunk.js.map",
+    "index.html": "/boxing-ai-trainer/index.html",
+    "static/css/main.e28e90fb.chunk.css.map": "/boxing-ai-trainer/static/css/main.e28e90fb.chunk.css.map",
+    "static/js/2.8bbef520.chunk.js.LICENSE.txt": "/boxing-ai-trainer/static/js/2.8bbef520.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.04d7ecb0.js",
+    "static/js/2.8bbef520.chunk.js",
+    "static/css/main.e28e90fb.chunk.css",
+    "static/js/main.40d83200.chunk.js"
+  ]
+}
