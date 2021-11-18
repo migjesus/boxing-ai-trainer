@@ -259,7 +259,7 @@ const App = () => {
 
   return (
     <div>
-      <p className="title">Boxing AI Trainer</p>
+      <p className="title">Boxing</p>
       <Sketch setup={setup} draw={draw} keyPressed={keyPressed} />
     </div>
   );
