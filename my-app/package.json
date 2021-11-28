@@ -1,11 +1,13 @@
 {
-  "homepage": "https://migjesus.github.io/boxing-ai-trainer/",
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^3.11.0",
+    "@tensorflow/tfjs-core": "^3.11.0",
+    "annyang": "^2.6.1",
     "array-most-common": "^1.0.0",
+    "browserify": "^17.0.0",
     "ml5": "^0.7.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
