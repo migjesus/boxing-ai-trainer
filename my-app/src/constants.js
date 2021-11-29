@@ -3,6 +3,5 @@ export const constants = {
   VIDEO_HEIGHT: 480,
   VIDEO_WIDTH: 640,
   POSSIBLE_POSES: ["a", "b", "c", "d"],
-  STATE: { WAITING: "waiting", COLLECTING: "collecting" },
   FPS: 60,
 };
