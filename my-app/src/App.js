@@ -4,16 +4,9 @@ import "react-p5/node_modules/p5/lib/addons/p5.sound";
 import annyang from "annyang";
 import mostCommon from "array-most-common";
 import { constants } from "./constants";
-/* import jsonContent from "./cmtest.json"; */
 
-const {
-  TOTAL_GAME_TIME,
-  VIDEO_HEIGHT,
-  VIDEO_WIDTH,
-  POSSIBLE_POSES,
-  STATE: { WAITING, COLLECTING },
-  FPS,
-} = constants;
+const { TOTAL_GAME_TIME, VIDEO_HEIGHT, VIDEO_WIDTH, POSSIBLE_POSES, FPS } =
+  constants;
 
 const VIDEO_SETTINGS = {
   video: {
@@ -30,8 +23,6 @@ const App = () => {
   let pose;
   let skeleton;
   let neuralNetwork;
-  let state = WAITING;
-  let targetLabel;
   let sequence = [];
   let randomPose = "d";
   let cool = false;
@@ -41,36 +32,6 @@ const App = () => {
   let intervalId;
   let testData = [];
   let bell;
-
-  /* 
-  const handleSaveToPC = (jsonData) => {
-    const fileData = JSON.stringify(jsonData);
-    const blob = new Blob([fileData], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.download = "testData.json";
-    link.href = url;
-    link.click();
-  }; */
-
-  /*  const keyPressed = (event) => {
-    if (event.key === "s") {
-      //neuralNetwork.saveData();
-      let jsonData = JSON.stringify(testData);
-      handleSaveToPC(jsonData);
-    } else {
-      targetLabel = event.key;
-      console.log(targetLabel);
-      setTimeout(() => {
-        console.log("collecting");
-        state = COLLECTING;
-        setTimeout(() => {
-          console.log("not collecting");
-          state = WAITING;
-        }, 30000);
-      }, 5000);
-    }
-  }; */
 
   const setup = (p5, canvasParentRef) => {
     if (annyang) {
@@ -102,9 +63,9 @@ const App = () => {
     };
     neuralNetwork = ml5.neuralNetwork(options);
     const modelSpecs = {
-      model: "mini20/model.json",
-      metadata: "mini20/model_meta.json",
-      weights: "mini20/model.weights.bin",
+      model: "model/model.json",
+      metadata: "model/model_meta.json",
+      weights: "model/model.weights.bin",
     };
     neuralNetwork?.load(modelSpecs);
   };
@@ -116,13 +77,12 @@ const App = () => {
     buttonGroup.style("margin", "20px");
     const playButton = p5.createButton("Fight & Stop");
     const debugButton = p5.createButton("Draw & Erase");
-    /*     const trainButton = p5.createButton("Train"); */
+
     playButton.parent(buttonGroup);
     debugButton.parent(buttonGroup);
-    /*     trainButton.parent(buttonGroup); */
+
     playButton.mousePressed(() => onPlayButtonClick(p5));
     debugButton.mousePressed(() => (debugMode = !debugMode));
-    /*     trainButton.mousePressed(() => onTrainButtonClick()); */
   };
 
   const onPlayButtonClick = () => {
@@ -144,18 +104,6 @@ const App = () => {
     }
   };
 
-  /*   const onTrainButtonClick = () => {
-    let options = {
-      inputs: 22,
-      outputs: 4,
-      task: "classification",
-      debug: true,
-    };
-    neuralNetwork = ml5.neuralNetwork(options);
-    neuralNetwork.loadData("mini.json", train);
-  };
- */
-
   const classifyData = () => {
     if (pose && pose.keypoints) {
       let inputs = [];
@@ -169,30 +117,9 @@ const App = () => {
     } else {
       classifyData();
     }
-    /* let file = JSON.parse(jsonContent);
-    neuralNetwork.classifyMultiple(file, getLabel); */
   };
 
   const getLabel = (error, results) => {
-    /*   console.log(results);
-    let final = [];
-    if (results) {
-      for (let i = 0; i < results.length; i++) {
-        let maxObjLabel = results[i].reduce((max, obj) =>
-          max.confidence > obj.confidence ? max : obj
-        );
-        final.push(maxObjLabel.label);
-      }
-      let ct = 0;
-      for (let i = 0; i < final.length; i++) {
-        if (final[i] === "c") {
-          ct++;
-        }
-      }
-      console.log(final);
-      console.log(ct);
-    } */
-
     if (error) {
       console.log("error");
       return;
@@ -215,16 +142,6 @@ const App = () => {
     }
   };
 
-  /*   const train = () => {
-    neuralNetwork.normalizeData();
-    neuralNetwork.train({ epochs: 100 }, saveModel);
-  };
- */
-
-  /*   const saveModel = () => {
-    neuralNetwork.save();
-  }; */
-
   const getData = (poses) => {
     if (poses.length === 0) {
       pose = {};
@@ -232,18 +149,6 @@ const App = () => {
       pose = poses[0].pose;
       skeleton = poses[0].skeleton;
       classifyData();
-      if (state === COLLECTING) {
-        let inputs = [];
-        for (let i = 0; i < 11; i++) {
-          let x = pose.keypoints[i].position.x;
-          let y = pose.keypoints[i].position.y;
-          inputs.push(x);
-          inputs.push(y);
-        }
-        let target = [targetLabel];
-        neuralNetwork.addData(inputs, target);
-        testData.push(inputs);
-      }
     }
   };
 
@@ -306,7 +211,6 @@ const App = () => {
   return (
     <div>
       <p className="title">AI Boxing Trainer</p>~
-      {/* falta adicionar keyPressed ao Sketch */}
       <Sketch setup={setup} draw={draw} />
     </div>
   );
