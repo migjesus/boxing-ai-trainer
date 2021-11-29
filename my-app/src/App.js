@@ -124,7 +124,7 @@ const App = () => {
     if (results !== undefined && results.lenght !== 0) {
       sequence.push(results[0].label);
     }
-    if (sequence.length === 10) {
+    if (sequence.length === 5) {
       if (mostCommon(sequence) === randomPose) {
         cool = true;
         timer !== 30 && movementCount++;

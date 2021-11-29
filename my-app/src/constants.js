@@ -3,5 +3,5 @@ export const constants = {
   VIDEO_HEIGHT: 480,
   VIDEO_WIDTH: 640,
   POSSIBLE_POSES: ["a", "b", "c", "d"],
-  FPS: 60,
+  FPS: 30,
 };
