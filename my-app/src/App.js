@@ -1,7 +1,6 @@
 import ml5 from "ml5";
 import Sketch from "react-p5";
-import * as p5 from "react-p5";
-import * as p5sound from "react-p5/node_modules/p5/lib/addons/p5.sound";
+import "react-p5/node_modules/p5/lib/addons/p5.sound";
 import annyang from "annyang";
 import mostCommon from "array-most-common";
 import { constants } from "./constants";
@@ -36,13 +35,11 @@ const App = () => {
   let sequence = [];
   let randomPose = "d";
   let cool = false;
-  let running = false;
   let timer = TOTAL_GAME_TIME;
   let movementCount = 0;
   let debugMode = false;
   let intervalId;
   let testData = [];
-  let bestScore = 0;
   let bell;
 
   /* 
@@ -110,9 +107,6 @@ const App = () => {
       weights: "mini20/model.weights.bin",
     };
     neuralNetwork?.load(modelSpecs);
-    /*    running = true;
-    p5.loop();
-    running = true; */
   };
 
   const createButtonGroup = (p5) => {
@@ -132,47 +126,13 @@ const App = () => {
   };
 
   const onPlayButtonClick = () => {
-    /*  if (!running) {
-       video = p5.createCapture(VIDEO_SETTINGS);
-      video.position(0, 0);
-      video.hide();
-      poseNet = ml5.poseNet(video);
-      poseNet.on("pose", getData);
-      let options = {
-        inputs: 22,
-        outputs: 4,
-        task: "classification",
-        debug: true,
-      };
-      neuralNetwork = ml5.neuralNetwork(options);
-      const modelSpecs = {
-        model: "mini20/model.json",
-        metadata: "mini20/model_meta.json",
-        weights: "mini20/model.weights.bin",
-      };
-      neuralNetwork?.load(modelSpecs);
-      running = true;
-      p5.loop();
-      running = true;
-      intervalId = setInterval(timeIt, 1000); 
-    }  else {
-      clearInterval(intervalId);
-      running = false;
-      timer = TOTAL_GAME_TIME;
-       video.remove();
-      poseNet?.removeListener("pose", getData);
-      p5.background(51);
-      p5.noLoop(); 
-    } */
-    console.log(intervalId);
     if (intervalId !== undefined) {
       clearInterval(intervalId);
       intervalId = undefined;
       timer = TOTAL_GAME_TIME;
-      movementCount > bestScore && (bestScore = movementCount);
-      movementCount = 0;
       bell.play();
     } else {
+      movementCount = 0;
       bell.play();
       intervalId = setInterval(timeIt, 1000);
     }
@@ -197,7 +157,7 @@ const App = () => {
  */
 
   const classifyData = () => {
-    if (pose && pose.keypoints /* && running && timer !== 0 */) {
+    if (pose && pose.keypoints) {
       let inputs = [];
       for (let i = 0; i < 11; i++) {
         let x = pose.keypoints[i].position.x;
@@ -206,10 +166,7 @@ const App = () => {
         inputs.push(y);
       }
       neuralNetwork.classify(inputs, getLabel);
-    } /* else if (!running || timer === 0) {
-      return;
-    } */ else {
-      /* setTimeout(classifyData, 100); */
+    } else {
       classifyData();
     }
     /* let file = JSON.parse(jsonContent);
@@ -246,7 +203,7 @@ const App = () => {
     if (sequence.length === 10) {
       if (mostCommon(sequence) === randomPose) {
         cool = true; // turn poseLabel green
-        movementCount++;
+        timer !== 30 && movementCount++;
         randomPose = POSSIBLE_POSES.filter((pose) => pose !== randomPose)[
           Math.floor(
             Math.random() *
@@ -271,16 +228,12 @@ const App = () => {
   const getData = (poses) => {
     if (poses.length === 0) {
       pose = {};
-    } /* else if (!running) {
-      console.log("entrei");
-      return;
-    } */ else {
+    } else {
       pose = poses[0].pose;
       skeleton = poses[0].skeleton;
       classifyData();
       if (state === COLLECTING) {
         let inputs = [];
-        //mudar consoante modelo
         for (let i = 0; i < 11; i++) {
           let x = pose.keypoints[i].position.x;
           let y = pose.keypoints[i].position.y;
@@ -320,7 +273,7 @@ const App = () => {
         p5.textSize(25);
         p5.fill(255, 0, 255);
         p5.text(
-          `Best Score: ${bestScore}`,
+          `Score: ${movementCount}`,
           VIDEO_WIDTH / 2 - 310,
           VIDEO_HEIGHT / 2 - 170
         );
@@ -328,20 +281,6 @@ const App = () => {
         p5.ellipse(VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 20, 80, 80);
       }
       if (timer === 0) {
-        /*   running = false; */
-        /* clearInterval(intervalId);
-        timer = TOTAL_GAME_TIME; */
-        /*   poseNet?.removeListener("pose", getData);
-        p5.background(51);
-        p5.textSize(40);
-        p5.text(
-          `Score: ${movementCount}`,
-          VIDEO_WIDTH / 2 - 150,
-          VIDEO_HEIGHT / 2
-        );
-        p5.noLoop(); */
-        /*  movementCount > bestScore && (bestScore = movementCount);
-        movementCount = 0; */
         onPlayButtonClick();
       }
     }
