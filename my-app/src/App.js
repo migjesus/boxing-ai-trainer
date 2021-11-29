@@ -30,7 +30,6 @@ const App = () => {
   let movementCount = 0;
   let debugMode = false;
   let intervalId;
-  let testData = [];
   let bell;
 
   const setup = (p5, canvasParentRef) => {
